@@ -22,15 +22,89 @@ The solution will be created using C++.
 
 Let's start by creating the puzzle and making random movements:
 
-{% highlight cpp %}
-#include iostream
+{% raw %}
+```cpp
+char PUZZLE[3][3] = 
+    {1, 2, 3,
+     4, 5, 6,
+     7, 8, 0};
 
-using namespace std;
+void makeRandomMovement(int &row, int &column)
+{
+    int movement = rand() % 4;
+    switch (movement)
+    {
+        case 0://Left
+            if(column > 0)
+            {
+                PUZZLE[row][column] = PUZZLE[row][column - 1];
+                column--;
+            }
+            break;
+        case 1://Up
+            if(row > 0)
+            {
+                PUZZLE[row][column] = PUZZLE[row - 1][column];
+                row--;
+            }
+            break;
+        case 2://Right
+            if(column < 2)
+            {
+                PUZZLE[row][column] = PUZZLE[row][column + 1];
+                column++;
+            }
+            break;
+        case 3://Down
+            if(row < 2)
+            {
+                PUZZLE[row][column] = PUZZLE[row + 1][column];
+                row++;
+            }
+            break;
+        default:
+            cout << "Error, default should not be reached." << endl;
+            break;
+    }
+    PUZZLE[row][column] = 0;
+}
 
 int main()
 {
+    //Initialize random seed with a static value to get the same random number each time
+    srand(4);
+    int row = 2;
+    int column = 2;
+    for (int i = 0; i < 1000; ++i)
+    {
+        makeRandomMovement(row, column);
+    }
     return 0;
 }
-{% endhighlight %}
+```
+{% endraw %}
+
+
+To measure time performance, let's count time elapsed for the solution: 
+{% raw %}
+```cpp
+int main()
+{
+    //Initialize random seed with a static value to get the same random number each time
+    srand(4);
+    int row = 2;
+    int column = 2;
+    for (int i = 0; i < 1000; ++i)
+    {
+        makeRandomMovement(row, column);
+    }
+    auto start = steady_clock::now();
+    solve(PUZZLE);
+    auto end = steady_clock::now();
+    cout << "Solution took " << duration_cast<milliseconds>(end - start).count() << " milliseconds." << endl;
+    return 0;
+}
+```
+{% endraw %}
 
 Working on the solution, feel free to check the project repository: [Github Repository](https://github.com/RafaelVC89/puzzle1_numbers)
