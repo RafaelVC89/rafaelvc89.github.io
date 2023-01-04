@@ -1,10 +1,10 @@
 ---
 layout: page
-title: project 1
-description: a project with a background image
-img: assets/img/12.jpg
+title: Puzzle 1
+description: Multiple solutions to this numbers puzzle!
+img: assets/img/project1_puzzle.png
 importance: 1
-category: work
+category: Algorithms
 ---
 
 Every project has a beautiful feature showcase page.
