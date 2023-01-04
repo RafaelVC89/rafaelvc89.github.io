@@ -1,8 +1,8 @@
 ---
 layout: page
-title: projects
+title: My projects
 permalink: /projects/
-description: A growing collection of your cool projects.
+description: I wanted to share some interesting algorithm puzzles I have been working on. On some of them, I added multiple solutions with different approaches that improved performance or memory usage.
 nav: true
 nav_order: 2
 display_categories: [Algorithms]
