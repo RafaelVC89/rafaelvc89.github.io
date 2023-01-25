@@ -38,4 +38,4 @@ And many cities in the USA:
 
 Outside of work, I try to stay up to date with latest tech news and gadgets (happy to try them by myself) and as a family guy, I love spending time with my wife and sons, nothing like a good movie night with caramel pop-corn and spicy chips.
 
-Currently working on this page, soon I will upload some blogs, stay tuned!
+Currently working on this page, but feel free to check my projects, stay tuned!
