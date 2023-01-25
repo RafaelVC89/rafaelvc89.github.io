@@ -4,10 +4,7 @@ title: submenus
 nav: true
 nav_order: 6
 dropdown: true
-children: 
-    - title: blogs
-      permalink: /blog/
-    - title: divider
+children:
     - title: projects
       permalink: /projects/
 ---
