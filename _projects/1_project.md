@@ -217,7 +217,141 @@ void makeMovement(char puzzle[3][3], direction_enum direction)
 ```
 {% endraw %}
 As expected, this direct approach does not reach a solution, as it generates a **Segmentation Fault Error**, this is caused due to the excessive recursive functions that the program calls as this puzzle has thousands of combinations.
-For our next step, let’s try a Breath First approach:
+For our next step, let’s try a Breadth First approach:
+<br />
+<br />
 
+## Path Finding: Breadth First
+Another path finding solution called Breadth First uses a Stack or a Queue to store the pending states instead of using recursion, the states are analyzed and new states are added to the Stack as they arise:
 
-Working on the solution, feel free to check the project repository: [Github Repository](https://github.com/RafaelVC89/puzzle1_numbers)
+{% raw %}
+```cpp
+struct State
+{
+    char puzzle[3][3];
+    direction_enum previousMovement;
+    int emptyRow;
+    int emptyCol;
+};
+
+class StatesStack
+{
+public:
+    StatesStack():mStates(new State[400000]), mSize(0) {}
+    ~StatesStack() { delete[] mStates; }
+    bool empty() { return mSize == 0;} 
+    void push(State state)
+    {
+        mStates[mSize] = state;
+        mSize++;
+    }
+    State pop()
+    {
+        mSize--;
+        return mStates[mSize];
+    }
+private:
+    State* mStates;
+    int mSize;
+};
+
+void solve(char puzzle[3][3])
+{
+    cout << "Solution starting." << endl;
+    
+    clearVisited();
+
+    State newState;
+    newState.previousMovement = NONE;
+    copyPuzzle(newState.puzzle, puzzle);
+    findEmptyPiece(newState);
+
+    StatesStack statesStack;
+    statesStack.push(newState);
+
+    direction_enum previousMovement = NONE;
+    bool solutionFound = false;
+    while(!solutionFound && !statesStack.empty())
+    {
+        State currentState = statesStack.pop();
+        previousMovement = currentState.previousMovement;
+        if (solved(currentState.puzzle))
+        {
+            solutionFound = true;
+            copyPuzzle(puzzle, currentState.puzzle);
+            continue;
+        }
+        
+        //LEFT
+        if (previousMovement != RIGHT && currentState.emptyCol > 0)
+        {
+            makeMovement(currentState, LEFT);
+            if (!visited(currentState.puzzle))
+            {
+                statesStack.push(currentState);
+                mark_visit(currentState.puzzle);
+            }
+            makeMovement(currentState, RIGHT);
+        }
+        //UP
+        if (previousMovement != DOWN && currentState.emptyRow > 0)
+        {
+            makeMovement(currentState, UP);
+            if (!visited(currentState.puzzle))
+            {
+                statesStack.push(currentState);
+                mark_visit(currentState.puzzle);
+            }
+            makeMovement(currentState, DOWN);
+        }
+        //RIGHT
+        if (previousMovement != LEFT && currentState.emptyCol < 2)
+        {
+            makeMovement(currentState, RIGHT);
+            if (!visited(currentState.puzzle))
+            {
+                statesStack.push(currentState);
+                mark_visit(currentState.puzzle);
+            }
+            makeMovement(currentState, LEFT);
+        }
+        //DOWN
+        if (previousMovement != UP && currentState.emptyRow < 2)
+        {
+            makeMovement(currentState, DOWN);
+            if (!visited(currentState.puzzle))
+            {
+                statesStack.push(currentState);
+                mark_visit(currentState.puzzle);
+            }
+            makeMovement(currentState, UP);
+        }
+    }
+    cout << "Solution found!" << endl;
+}
+```
+{% endraw %}
+
+<br />
+This implementation reaches a solution!:
+{% raw %}
+```cpp
+Puzzle to solve: 
+7 4 5
+2 3 1
+6 0 8
+
+Solution starting.
+Solution found!
+Puzzle after solution:
+1 2 3
+4 5 6
+7 8 0
+
+Solution took 2396 milliseconds.
+```
+{% endraw %}
+The catch is that it uses a large amount of memory to store the pending states. The puzzle was solved in 2.3 seconds and it can be improved using A star search algorithm.
+
+<br />
+Working on A Star search implementation, feel free to check the project repository: [Github Repository](https://github.com/RafaelVC89/puzzle1_numbers)
