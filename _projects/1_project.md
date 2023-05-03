@@ -354,4 +354,204 @@ Solution took 2396 milliseconds.
 The catch is that it uses a large amount of memory to store the pending states. The puzzle was solved in 2.3 seconds and it can be improved using A star search algorithm.
 
 <br />
-Working on A Star search implementation, feel free to check the project repository: [Github Repository](https://github.com/RafaelVC89/puzzle1_numbers)
+<br />
+## Path Finding: A*
+A* is the most optimized solution, as it sets a higher priority to the states that are closer to solving the puzzle.
+This solution uses a priority queue (min-heap) structure to store the states that are still pending to be analyzed and it provides the one with higher priority each time you call the pop function:
+
+{% raw %}
+```cpp
+void setStatePriority(State &state)
+{
+    state.priority = 0;
+    if (state.puzzle[0][0] == 1) state.priority++;
+    if (state.puzzle[0][1] == 2) state.priority++;
+    if (state.puzzle[0][2] == 3) state.priority++;
+    if (state.puzzle[1][0] == 4) state.priority++;
+    if (state.puzzle[1][1] == 5) state.priority++;
+    if (state.puzzle[1][2] == 6) state.priority++;
+    if (state.puzzle[2][0] == 7) state.priority++;
+    if (state.puzzle[2][1] == 8) state.priority++;
+    if (state.puzzle[2][2] == 0) state.priority++;
+}
+
+class PriorityQueue
+{
+public:
+    PriorityQueue():mStates(new State[400000]), mSize(0) {}
+    ~PriorityQueue() { delete[] mStates; }
+    bool empty() { return mSize == 0;} 
+    void push(State state);
+    State pop();
+
+private:
+    int getParentIndex(int childIndex) { return (childIndex - 1) / 2; }
+    int getLeftChildIndex(int parentIndex) { return (parentIndex * 2) + 1; }
+    int getRightChildIndex(int parentIndex) { return (parentIndex * 2) + 2; }
+    void siftUp(int childIndex);
+    void siftDown(int parentIndex);
+
+    State* mStates;
+    int mSize;
+};
+
+void PriorityQueue::push(State state)
+{
+    mStates[mSize] = state;
+    mSize++;
+    siftUp(mSize - 1);
+}
+
+State PriorityQueue::pop()
+{
+    State returnState = mStates[0];
+    mSize--;
+    mStates[0] = mStates[mSize];
+    siftDown(0);
+    return returnState;
+}
+
+void PriorityQueue::siftUp(int childIndex)
+{
+    if(childIndex == 0)
+    {
+        return;
+    }
+    int parentIndex = getParentIndex(childIndex);
+    if(mStates[childIndex].priority > mStates[parentIndex].priority)
+    {
+        State temporalState = mStates[childIndex];
+        mStates[childIndex] = mStates[parentIndex];
+        mStates[parentIndex] = temporalState;
+        siftUp(parentIndex);
+    }
+}
+void PriorityQueue::siftDown(int parentIndex)
+{
+    int highestPriorityChildIndex = getLeftChildIndex(parentIndex);
+    if (highestPriorityChildIndex < mSize)
+    {
+        int rightChildIndex = getRightChildIndex(parentIndex);
+        if(rightChildIndex < mSize && mStates[rightChildIndex].priority > mStates[highestPriorityChildIndex].priority)
+        {
+            highestPriorityChildIndex = rightChildIndex;
+        }
+        if (mStates[highestPriorityChildIndex].priority > mStates[parentIndex].priority)
+        {
+            State temporalState = mStates[highestPriorityChildIndex];
+            mStates[highestPriorityChildIndex] = mStates[parentIndex];
+            mStates[parentIndex] = temporalState;
+            siftDown(highestPriorityChildIndex);
+        }
+    }
+}
+
+void solve(char puzzle[3][3])
+{
+    cout << "Solution starting." << endl;
+    clearVisited();
+
+    State newState;
+    newState.previousMovement = NONE;
+    copyPuzzle(newState.puzzle, puzzle);
+    findEmptyPiece(newState);
+    setStatePriority(newState);
+
+    PriorityQueue priorityQueue;
+    priorityQueue.push(newState);
+
+    direction_enum previousMovement = NONE;
+    bool solutionFound = false;
+    int statesAnalyzed = 0;
+    while(!solutionFound && !priorityQueue.empty())
+    {
+        statesAnalyzed++;
+        State currentState = priorityQueue.pop();
+        
+        previousMovement = currentState.previousMovement;
+        if (solved(currentState.puzzle))
+        {
+            solutionFound = true;
+            copyPuzzle(puzzle, currentState.puzzle);
+            continue;
+        }
+        
+        //LEFT
+        if (previousMovement != RIGHT && currentState.emptyCol > 0)
+        {
+            makeMovement(currentState, LEFT);
+            if (!visited(currentState.puzzle))
+            {
+                setStatePriority(currentState);
+                priorityQueue.push(currentState);
+                mark_visit(currentState.puzzle);
+            }
+            makeMovement(currentState, RIGHT);
+        }
+        //UP
+        if (previousMovement != DOWN && currentState.emptyRow > 0)
+        {
+            makeMovement(currentState, UP);
+            if (!visited(currentState.puzzle))
+            {
+                setStatePriority(currentState);
+                priorityQueue.push(currentState);
+                mark_visit(currentState.puzzle);
+            }
+            makeMovement(currentState, DOWN);
+        }
+        //RIGHT
+        if (previousMovement != LEFT && currentState.emptyCol < 2)
+        {
+            makeMovement(currentState, RIGHT);
+            if (!visited(currentState.puzzle))
+            {
+                setStatePriority(currentState);
+                priorityQueue.push(currentState);
+                mark_visit(currentState.puzzle);
+            }
+            makeMovement(currentState, LEFT);
+        }
+        //DOWN
+        if (previousMovement != UP && currentState.emptyRow < 2)
+        {
+            makeMovement(currentState, DOWN);
+            if (!visited(currentState.puzzle))
+            {
+                setStatePriority(currentState);
+                priorityQueue.push(currentState);
+                mark_visit(currentState.puzzle);
+            }
+            makeMovement(currentState, UP);
+        }
+    }
+    cout << "Solution found! " << statesAnalyzed << " states were analyzed." << endl << endl;
+}
+```
+{% endraw %}
+
+<br />
+As a result, the solution is found with less than 10% of states analyzed on previous solutions:
+{% raw %}
+```cpp
+Puzzle to solve: 
+4 1 2
+5 8 7
+0 6 3
+
+Solution starting.
+Solution found! 1098 states were analyzed.
+
+Puzzle after solution:
+1 2 3
+4 5 6
+7 8 0
+
+Solution took 2518 milliseconds.
+```
+{% endraw %}
+
+<br />
+Feel free to check the full code of all the implementations in the project repository: [Github Repository](https://github.com/RafaelVC89/puzzle1_numbers)
+<br />
+**Happy puzzling!**
