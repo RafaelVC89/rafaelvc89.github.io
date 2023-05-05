@@ -258,8 +258,7 @@ private:
 void solve(char puzzle[3][3])
 {
     cout << "Solution starting." << endl;
-    
-    clearVisited();
+    unordered_set<int> visitedSet;
 
     State newState;
     newState.previousMovement = NONE;
@@ -288,10 +287,10 @@ void solve(char puzzle[3][3])
         if (previousMovement != RIGHT && currentState.emptyCol > 0)
         {
             makeMovement(currentState, LEFT);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 statesStack.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, RIGHT);
         }
@@ -299,10 +298,10 @@ void solve(char puzzle[3][3])
         if (previousMovement != DOWN && currentState.emptyRow > 0)
         {
             makeMovement(currentState, UP);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 statesStack.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, DOWN);
         }
@@ -310,10 +309,10 @@ void solve(char puzzle[3][3])
         if (previousMovement != LEFT && currentState.emptyCol < 2)
         {
             makeMovement(currentState, RIGHT);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 statesStack.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, LEFT);
         }
@@ -321,10 +320,10 @@ void solve(char puzzle[3][3])
         if (previousMovement != UP && currentState.emptyRow < 2)
         {
             makeMovement(currentState, DOWN);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 statesStack.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, UP);
         }
@@ -346,15 +345,15 @@ Puzzle to solve:
 Solution starting.
 Solution found! 80229 states were analyzed.
 
-Puzzle after solution:
+Puzzle after solution: 
 1 2 3
 4 5 6
 7 8 0
 
-Solution took 2343 milliseconds.
+Solution took 887 milliseconds.
 ```
 {% endraw %}
-The catch is that it uses a large amount of memory to store the pending states and it analyzed more than 80 thousand states to reach a solution. This can be improved using A star search algorithm.
+The catch is that it uses a large amount of memory to store the pending states and it analyzed more than 80 thousand states to reach a solution. And it takes more than 800 milliseconds, this can be improved using A star search algorithm.
 
 <br />
 <br />
@@ -453,7 +452,7 @@ void PriorityQueue::siftDown(int parentIndex)
 void solve(char puzzle[3][3])
 {
     cout << "Solution starting." << endl;
-    clearVisited();
+    unordered_set<int> visitedSet;
 
     State newState;
     newState.previousMovement = NONE;
@@ -484,11 +483,11 @@ void solve(char puzzle[3][3])
         if (previousMovement != RIGHT && currentState.emptyCol > 0)
         {
             makeMovement(currentState, LEFT);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 setStatePriority(currentState);
                 priorityQueue.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, RIGHT);
         }
@@ -496,11 +495,11 @@ void solve(char puzzle[3][3])
         if (previousMovement != DOWN && currentState.emptyRow > 0)
         {
             makeMovement(currentState, UP);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 setStatePriority(currentState);
                 priorityQueue.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, DOWN);
         }
@@ -508,11 +507,11 @@ void solve(char puzzle[3][3])
         if (previousMovement != LEFT && currentState.emptyCol < 2)
         {
             makeMovement(currentState, RIGHT);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 setStatePriority(currentState);
                 priorityQueue.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, LEFT);
         }
@@ -520,11 +519,11 @@ void solve(char puzzle[3][3])
         if (previousMovement != UP && currentState.emptyRow < 2)
         {
             makeMovement(currentState, DOWN);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 setStatePriority(currentState);
                 priorityQueue.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, UP);
         }
@@ -551,7 +550,7 @@ Puzzle after solution:
 4 5 6
 7 8 0
 
-Solution took 2161 milliseconds.
+Solution took 2 milliseconds.
 ```
 {% endraw %}
 
