@@ -271,8 +271,10 @@ void solve(char puzzle[3][3])
 
     direction_enum previousMovement = NONE;
     bool solutionFound = false;
+    int statesAnalyzed = 0;
     while(!solutionFound && !statesStack.empty())
     {
+        statesAnalyzed++;
         State currentState = statesStack.pop();
         previousMovement = currentState.previousMovement;
         if (solved(currentState.puzzle))
@@ -327,7 +329,7 @@ void solve(char puzzle[3][3])
             makeMovement(currentState, UP);
         }
     }
-    cout << "Solution found!" << endl;
+    cout << "Solution found! " << statesAnalyzed << " states were analyzed." << endl << endl;
 }
 ```
 {% endraw %}
@@ -337,21 +339,22 @@ This implementation reaches a solution!:
 {% raw %}
 ```cpp
 Puzzle to solve: 
-7 4 5
-2 3 1
-6 0 8
+4 1 2
+5 8 7
+0 6 3
 
 Solution starting.
-Solution found!
+Solution found! 80229 states were analyzed.
+
 Puzzle after solution:
 1 2 3
 4 5 6
 7 8 0
 
-Solution took 2396 milliseconds.
+Solution took 2343 milliseconds.
 ```
 {% endraw %}
-The catch is that it uses a large amount of memory to store the pending states. The puzzle was solved in 2.3 seconds and it can be improved using A star search algorithm.
+The catch is that it uses a large amount of memory to store the pending states and it analyzed more than 80 thousand states to reach a solution. This can be improved using A star search algorithm.
 
 <br />
 <br />
@@ -364,7 +367,7 @@ This solution uses a priority queue (min-heap) structure to store the states tha
 void setStatePriority(State &state)
 {
     state.priority = 0;
-    if (state.puzzle[0][0] == 1) state.priority++;
+    if (state.puzzle[0][0] == 1) state.priority+=2;
     if (state.puzzle[0][1] == 2) state.priority++;
     if (state.puzzle[0][2] == 3) state.priority++;
     if (state.puzzle[1][0] == 4) state.priority++;
@@ -373,6 +376,7 @@ void setStatePriority(State &state)
     if (state.puzzle[2][0] == 7) state.priority++;
     if (state.puzzle[2][1] == 8) state.priority++;
     if (state.puzzle[2][2] == 0) state.priority++;
+    if (state.puzzle[0][0] == 1 && state.puzzle[0][1] == 2 && state.puzzle[0][2] == 3) state.priority+=6; // extra priority if the top numbers are already in the right position
 }
 
 class PriorityQueue
@@ -531,7 +535,7 @@ void solve(char puzzle[3][3])
 {% endraw %}
 
 <br />
-As a result, the solution is found with less than 10% of states analyzed on previous solutions:
+As a result, the solution is found with less than 1% of the states analyzed compared to previous solutions:
 {% raw %}
 ```cpp
 Puzzle to solve: 
@@ -540,14 +544,14 @@ Puzzle to solve:
 0 6 3
 
 Solution starting.
-Solution found! 1098 states were analyzed.
+Solution found! 470 states were analyzed.
 
 Puzzle after solution:
 1 2 3
 4 5 6
 7 8 0
 
-Solution took 2518 milliseconds.
+Solution took 2161 milliseconds.
 ```
 {% endraw %}
 
